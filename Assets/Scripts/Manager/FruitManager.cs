@@ -11,11 +11,13 @@ public class FruitManager : MonoBehaviour
 
     public float currentFallingSpeed;
 
-    private float normalFallingSpeed = 3f;
+    private float normalFallingSpeed = 2f;
 
     private FruitSpawnHelper spawnHelper;
 
-    private readonly float spawningSpeed = 1f;
+    public float spawningSpeed = 2f;
+
+
 
     private void Awake()
     {

@@ -28,7 +28,7 @@ public class StateMachine : MonoBehaviour
 
     public void SwitchGameState(GameStates stateToSwitch)
     {
-        if(stateToSwitch == currentGameState) { Debug.LogWarning("O.o"); return; }
+        if(stateToSwitch == currentGameState) { return; }
         GameStates lastgameState = currentGameState;
 
         currentStateHandler.TearDown();

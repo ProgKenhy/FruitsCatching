@@ -8,7 +8,6 @@ public class Paused : GameStateHandler
     {
         Time.timeScale = 0;
         PausedMenuUIManager.instance.Enable(true);
-        AdsManager.instance.ShowBanner();
     }
 
     public override void TearDown()

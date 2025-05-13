@@ -7,7 +7,6 @@ public class Menu : GameStateHandler
     public override void Setup(GameStates lastgameState)
     {
         StartMenuUIManager.instance.Enable(true);
-        AdsManager.instance.ShowBanner();
     }
 
     public override void TearDown()

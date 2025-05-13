@@ -7,9 +7,13 @@ public class Basket : MonoBehaviour
     Vector3 inputPosition;
     bool touched;
 
+    // Переменная для определения доли экрана для управления корзиной
+    [Range(0.1f, 1.0f)]
+    public float controlAreaHeight = 0.33f; // Нижняя треть экрана (значение по умолчанию)
+
     private void Update()
     {
-        if (InputStarted())
+        if (InputStarted() && IsInputInControlArea())
         {
             touched = true;
         }
@@ -24,73 +28,76 @@ public class Basket : MonoBehaviour
         }
     }
 
-    void MoveBasket()
+    // Проверяем, находится ли ввод в нижней части экрана для управления корзиной
+    bool IsInputInControlArea()
     {
-        Vector3 targetPosition = transform.position;
-        if (TouchInput())
+        Vector2 inputPos;
+
+        if (Input.touchCount > 0)
         {
-            inputPosition = GetCursorPosition(Input.GetTouch(0).position);
+            inputPos = Input.GetTouch(0).position;
         }
         else
         {
-            inputPosition = GetCursorPosition(Input.mousePosition);
+            inputPos = Input.mousePosition;
         }
-        targetPosition.x = inputPosition.x;
 
+        // Проверяем, находится ли ввод в нижней части экрана (ниже controlAreaHeight)
+        return inputPos.y < Screen.height * controlAreaHeight;
+    }
+
+    void MoveBasket()
+    {
+        Vector3 targetPosition = transform.position;
+
+        // Продолжаем отслеживать ввод в нижней части экрана
+        if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+            // Проверяем, что касание всё ещё в зоне управления
+            if (touch.position.y < Screen.height * controlAreaHeight)
+            {
+                inputPosition = GetCursorPosition(touch.position);
+            }
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            // Проверяем, что мышь всё ещё в зоне управления
+            if (Input.mousePosition.y < Screen.height * controlAreaHeight)
+            {
+                inputPosition = GetCursorPosition(Input.mousePosition);
+            }
+        }
+
+        targetPosition.x = inputPosition.x;
         float step = 30 * Time.deltaTime;
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, step);
     }
 
     Vector3 GetCursorPosition(Vector3 input)
     {
-        return Camera.main.ScreenToWorldPoint(new Vector3(input.x, input.y, input.z));
+        return Camera.main.ScreenToWorldPoint(new Vector3(input.x, input.y, 10));
     }
-
 
     private bool InputStarted()
     {
-        return TouchInput() || MouseInput();
+        if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+            return touch.phase == TouchPhase.Began && touch.position.y < Screen.height * controlAreaHeight;
+        }
+
+        return Input.GetMouseButtonDown(0) && Input.mousePosition.y < Screen.height * controlAreaHeight;
     }
 
     private bool InputEnded()
     {
-        return TouchEnded() || MouseEnded();
-    }
-
-    private bool TouchInput()
-    {
         if (Input.touchCount > 0)
         {
-            Touch touch = Input.GetTouch(0); //Only First touch
-            if (touch.phase == TouchPhase.Began)
-            {
-                return true;
-            }
+            Touch touch = Input.GetTouch(0);
+            return touch.phase == TouchPhase.Ended;
         }
-        return false;
-    }
 
-    private bool TouchEnded()
-    {
-        if (Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0); //Only First touch
-            if (touch.phase == TouchPhase.Ended)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private bool MouseInput()
-    {
-        return Input.GetMouseButtonDown(0);
-    }
-
-    private bool MouseEnded()
-    {
         return Input.GetMouseButtonUp(0);
     }
-
 }

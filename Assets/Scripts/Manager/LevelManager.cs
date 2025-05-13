@@ -16,12 +16,12 @@ public class LevelManager : MonoBehaviour
 
     private GameObject fruitToShow;
 
-    private Vector3 LevelFruitSize = new Vector3(.6f, .6f, 6f);
+    private Vector3 LevelFruitSize = new Vector3(.3f, .3f, 3f);
 
     private TextMeshProUGUI levelTexttmpro;
 
     private int currentLevel;
-    private int FruitsPerLevel = 10;
+    private int FruitsPerLevel = 5;
 
     private void Awake()
     {
@@ -58,6 +58,8 @@ public class LevelManager : MonoBehaviour
         {
             FruitManager.instance.HideFruits();
             FruitManager.instance.currentFallingSpeed += .2f;
+            if (FruitManager.instance.spawningSpeed - .1f > .5f) {
+                FruitManager.instance.spawningSpeed -= .1f; }
             currentLevel++;
             LevelStart();
         }
@@ -92,11 +94,10 @@ public class LevelManager : MonoBehaviour
         return fruitToShow;
     }
 
-    Fruits GetRandomFruit()
+    public Fruits GetRandomFruit()
     {
-        Array values = Enum.GetValues(typeof(Fruits));
-        System.Random random = new System.Random();
-        return (Fruits)values.GetValue(random.Next(values.Length));
+        var values = (Fruits[])Enum.GetValues(typeof(Fruits));
+        return values[UnityEngine.Random.Range(0, values.Length)];
     }
 
     private void SingletonPattern()
